@@ -15,6 +15,7 @@ import { CheckCircle2Icon } from "lucide-react";
 import { addComment, getComments } from "@/app/server/actions/Comments";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface CommentDialogProps {
   postId: string;
@@ -37,7 +38,7 @@ export const CommentDialog = ({ postId }: CommentDialogProps) => {
       setComment("");
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
     },
-    onError: (err: any) => {
+    onError: ({err}:{err:{message:string}}) => {
       toast.error(err.message || "Failed to add comment");
     },
   });
@@ -58,8 +59,20 @@ export const CommentDialog = ({ postId }: CommentDialogProps) => {
 
         <div className="pt-4 max-h-60 overflow-y-auto text-sm text-muted-foreground">
           {comments?.map((c) => (
-            <div key={c.id} className="border-t py-2">
-              <Link href={`/user/${c.userId}`}>{c.user?.name || "User"}:</Link> {c.content}
+            <div key={c.id} className="border-t py-2 flex items-center gap-1.5">
+              <Image
+                src={
+                  c.user.image && c.user.image !== ""
+                    ? c.user.image
+                    : "/nouserImage.webp"
+                }
+                alt="user image"
+                width={50}
+                height={50}
+                className="rounded-full object-cover"
+              />{" "}
+              <Link href={`/user/${c.userId}`}>{c.user?.name || "User"}:</Link>{" "}
+              {c.content}
             </div>
           ))}
         </div>

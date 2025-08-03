@@ -10,13 +10,14 @@ const Page = () => {
   const [email, setEmail] = useState<string>("");
   const [name, setname] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [err, setErr] = useState<string>("");
+ 
 
   const mutation = useMutation({
     mutationKey: ["create-user"],
     mutationFn: createUser,
     onSuccess: () => {
       toast("Welcome");
+      redirect("/")
     },
     onError: (err) => {
       toast(err.message);

@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Provider from "@/components/Provider";
 import { Toaster } from "sonner";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import SideNav from "@/components/SideNav";
 import NavBar from "@/components/NavBar";
 
@@ -34,7 +33,7 @@ export default function RootLayout({
       >
         <Provider>
           <SideNav />
-          <main className="bg-muted flex h-screen w-screen flex-col">
+          <main className=" flex h-screen w-screen flex-col">
             <NavBar/>
             {children}
             <Toaster />

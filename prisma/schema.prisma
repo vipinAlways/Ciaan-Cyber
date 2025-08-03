@@ -24,10 +24,9 @@ model User {
   posts         Post[]
   liked         Like[]
   comments      Comments[]
-  following     Follow[]   @relation("following")
-  followers     Follow[]   @relation("followers")
-  profesion       String?
-  Bio             String?
+
+  profesion String?
+  Bio       String?
 }
 
 model Account {
@@ -97,16 +96,4 @@ model Comments {
   createdAt DateTime @default(now())
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Follow {
-  id          String   @id @default(uuid())
-  followerId  String
-  followingId String
-  createdAt   DateTime @default(now())
-  follower    User     @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
-
-  following User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
-
-  @@unique([followerId, followingId])
 }

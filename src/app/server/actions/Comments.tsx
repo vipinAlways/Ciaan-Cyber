@@ -1,5 +1,6 @@
 "use server";
-import { auth } from "@/app/api/auth/[...nextauth]/route";
+
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 
 export const getComments = async (postId: string) => {
@@ -16,6 +17,22 @@ export const getComments = async (postId: string) => {
 
     return comments;
   } catch (error) {
+    console.log(error);
+    throw new Error("Error fetching comments");
+  }
+};
+export const getLikes = async (postId: string) => {
+  try {
+    const likes = await db.like.findMany({
+      where: { postId },
+      include: {
+        user: true,
+      },
+    });
+
+    return likes;
+  } catch (error) {
+    console.log('error', error)
     throw new Error("Error fetching comments");
   }
 };
@@ -49,6 +66,7 @@ export const addComment = async ({
 
     return newComment;
   } catch (error) {
+    console.log(error);
     throw new Error("Error adding comment");
   }
 };
@@ -87,5 +105,3 @@ export const likePost = async (postId: string) => {
     return { liked: true };
   }
 };
-
-export 

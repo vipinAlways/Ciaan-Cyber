@@ -7,17 +7,23 @@ import { CommentDialog } from "./CommetsDialog";
 import { likePost } from "@/app/server/actions/Comments";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
+import LikeDialog from "./LikeDialog";
+import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Link from "next/link";
 
-const DashBoard = () => {
+const DashBoard = ({id}:{id:string}) => {
   const queryClient = useQueryClient();
-
+  const session = useSession();
+  const isMobile = useIsMobile()
   const {
     data: posts,
     isLoading,
     error,
   } = useQuery({
     queryKey: ["all posts"],
-    queryFn: getAllPosts,
+    queryFn: ()=>getAllPosts(id),
   });
 
   const like = useMutation({
@@ -26,18 +32,17 @@ const DashBoard = () => {
     onSuccess: () => {
       toast.success("Post liked");
       queryClient.invalidateQueries({ queryKey: ["all posts"] });
+      queryClient.invalidateQueries({ queryKey: ["all likes"] });
     },
     onError: () => {
       toast.error("Something went wrong");
     },
   });
-  
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Failed to load posts.</p>;
-  ;
   return (
-    <div className="flex flex-col gap-5 items-center w-full py-5">
+    <div className={cn("flex flex-col gap-5 items-center w-full py-5",isMobile && "p-3")}>
       {posts?.map((post) => (
         <div key={post.id} className="w-96 border p-4 rounded-lg shadow-sm">
           <div className="flex items-center gap-2 mb-2">
@@ -53,10 +58,11 @@ const DashBoard = () => {
               className="rounded-full object-cover"
             />
 
-            <span className="font-medium">
+            <Link href={`/user/${post.userId}`}className="font-medium">
               {post.user?.name || "Anonymous"}
-            </span>
+            </Link>
           </div>
+           <p className="mt-2">{post.caption}</p>
           <Image
             src={
               post.image && post.image !== '""'
@@ -68,18 +74,23 @@ const DashBoard = () => {
             height={300}
             className="rounded-lg object-cover w-full h-auto border"
           />
-          <p className="mt-2">{post.caption}</p>
-          <div className="text-sm text-zinc-500 mt-1">
+         
+          <div className="text-sm text-zinc-500 mt-1 flex justify-around  ">
             <div className="flex gap-2 items-center">
               {post.comments.length} <CommentDialog postId={post.id} />
             </div>{" "}
             <div className="flex gap-2 items-center">
               ·{post.likes.length}{" "}
               <Heart
-                className="size-5 text-red-500 cursor-pointer"
+                className={cn(
+                  "size-5 cursor-pointer",
+                  post.likes.find(
+                    (lie) => lie.userId === session?.data?.user.id
+                  ) && "text-red-600"
+                )}
                 onClick={() => like.mutate(post.id)}
               />
-              likes
+              <LikeDialog postId={post.id} />
             </div>
           </div>
         </div>

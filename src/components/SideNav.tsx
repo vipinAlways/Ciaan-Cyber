@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 import React from "react";
 import {
   Sidebar,
@@ -9,21 +8,22 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
-
 } from "./ui/sidebar";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getUser } from "@/app/server/actions/User";
+import { signOut, useSession } from "next-auth/react";
+import { Button } from "./ui/button";
 
 const SideNav = () => {
-  const { data, isLoading } = useQuery({
+  const session = useSession();
+  const { data } = useQuery({
     queryKey: ["use-auth"],
-    queryFn: getUser,
+    queryFn: () => getUser(session?.data?.user.id ?? ""),
   });
-  console.log(data);
-  if (isLoading || !data) return <div>loading....</div>;
+  if(!data) return null
   return (
     <Sidebar className="w-64">
       <SidebarHeader className="text-sidebar-accent-foreground">
@@ -31,8 +31,7 @@ const SideNav = () => {
           href={"/"}
           className="flex items-center gap-4 border-b-2 pt-2 pb-4"
         >
-          <h2 className="object-cover">Li</h2>
-          <p className="text-2xl font-semibold">Meet.AI</p>
+          <p className="text-2xl font-semibold">Vipin LinkedIn</p>
         </Link>
       </SidebarHeader>
       <SidebarContent>
@@ -48,7 +47,12 @@ const SideNav = () => {
                     alt="userImage"
                     className="rounded-full object-cover"
                   />
-                  <h3 className="text-xl font-medium">{data.name}</h3>
+                  <Link
+                    href={`/user/${data.id}`}
+                    className="text-xl font-medium"
+                  >
+                    {data.name}
+                  </Link>
                 </div>
               </div>
             </SidebarMenu>
@@ -65,7 +69,7 @@ const SideNav = () => {
                   id="profession"
                   className="bg-zinc-400/30 border-green-400 px-4 py-1  rounded-xl "
                 >
-                  {data.name ?? ""}{" "}
+                  {data.profesion ?? ""}{" "}
                 </h3>
               </div>
               <div className="flex items-start flex-col gap-1.5 text-lg">
@@ -76,7 +80,7 @@ const SideNav = () => {
                   id="bio"
                   className="bg-zinc-400/30 border-green-400 px-4 py-1 text-sm rounded-xl "
                 >
-                  {"i am fulll task developers here plaese comn"}{" "}
+                  {data.Bio ?? ""}
                 </h3>
               </div>
             </SidebarMenu>
@@ -84,7 +88,9 @@ const SideNav = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="text-zinc-100"></SidebarFooter>
+      <SidebarFooter className="text-zinc-100">
+        <Button onClick={() => signOut()}>Log out</Button>
+      </SidebarFooter>
     </Sidebar>
   );
 };

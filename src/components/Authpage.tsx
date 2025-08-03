@@ -4,11 +4,12 @@ import { redirect } from "next/navigation";
 import React, { FormEvent, useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const Authpage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [err, setErr] = useState<string>("");
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -18,9 +19,16 @@ const Authpage = () => {
       password: password,
       redirect: false,
     });
-
-    if (req?.ok) {
-      toast("welcome  ");
+    if (req?.error) {
+      toast("User Not Found!", {
+        description: (
+          <Link href="/api/auth/sign-up" className="underline text-blue-500">
+            Sign up
+          </Link>
+        ),
+      });
+    } else if (req?.ok) {
+      toast("welcome");
       redirect("/");
     }
   };
@@ -55,6 +63,8 @@ const Authpage = () => {
       >
         Google
       </Button>
+
+      <Link href={"/api/aut/sign-up"}>No user Sign-up</Link>
     </div>
   );
 };

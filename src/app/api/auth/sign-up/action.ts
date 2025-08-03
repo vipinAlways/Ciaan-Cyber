@@ -1,7 +1,8 @@
 "use server";
 
+import { signIn } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { signIn } from "../[...nextauth]/route";
+
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
@@ -21,7 +22,7 @@ export const createUser = async ({ name, email, password }: Props) => {
 
     const hashPassword = await bcrypt.hash(password, 10); // ✅ await here!
 
-    const createUser = await db.user.create({
+    await db.user.create({
       data: {
         name,
         email,
