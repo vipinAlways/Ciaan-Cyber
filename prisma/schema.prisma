@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @unique @default(cuid())
+  name          String?
+  email         String?    @unique
+  image         String?    @default("")
+  emailVerified DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  sessions      Session[]
+  password      String     @default("")
+  accounts      Account[]
+  posts         Post[]
+  liked         Like[]
+  comments      Comments[]
+  following     Follow[]   @relation("following")
+  followers     Follow[]   @relation("followers")
+  profesion       String?
+  Bio             String?
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  // id         String   @id @default(uuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Post {
+  id       String     @id @default(uuid())
+  image    String
+  caption  String
+  userId   String
+  time     DateTime
+  likes    Like[]
+  comments Comments[]
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id     String @id @default(uuid())
+  postId String
+  userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Comments {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+
+  following User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
