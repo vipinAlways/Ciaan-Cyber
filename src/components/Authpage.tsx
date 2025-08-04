@@ -64,7 +64,7 @@ const Authpage = () => {
         Google
       </Button>
 
-      <Link href={"/api/aut/sign-up"}>No user Sign-up</Link>
+      <Link href={"/api/auth/sign-up"}>No user Sign-up</Link>
     </div>
   );
 };
