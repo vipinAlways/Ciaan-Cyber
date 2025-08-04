@@ -20,7 +20,7 @@ export const createUser = async ({ name, email, password }: Props) => {
 
     if (existingUser) throw new Error("User already registered");
 
-    const hashPassword = await bcrypt.hash(password, 10); // ✅ await here!
+    const hashPassword = await bcrypt.hash(password, 10);
 
     await db.user.create({
       data: {
